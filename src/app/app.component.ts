@@ -6,7 +6,7 @@ import { AngularAgoraRtcService, Stream } from 'angular-agora-rtc';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent  {
   title = 'angagora';
   localStream: Stream;
   remoteCalls:any = [];
@@ -20,10 +20,23 @@ export class AppComponent implements OnInit {
     startCall() {
       this.agoraService.client.join(null, '1000', null, (uid) => {
         this.localStream = this.agoraService.createStream(uid, true, null, null, true, false);
-        this.localStream.setVideoProfile('720p_3');
+        this.localStream.setVideoProfile('720p_6');
         this.subscribeToStreams();
       });
     }
+    // Leave the channel
+    endCall(){
+      this.agoraService.client.leave(() => {
+        console.log('Called ended successfully');
+        this.localStream.stop();
+        this.localStream.close();
+      },
+      (err) => {
+        console.log('error ending call');
+      }
+      )
+    }
+
   
     // Add
     private subscribeToStreams() {
@@ -72,7 +85,7 @@ export class AppComponent implements OnInit {
       this.agoraService.client.on('stream-subscribed', (evt) => {
         const stream = evt.stream;
         if (!this.remoteCalls.includes(`agora_remote${stream.getId()}`)) this.remoteCalls.push(`agora_remote${stream.getId()}`);
-        setTimeout(() => stream.play(`agora_remote${stream.getId()}`), 2000);
+        setTimeout(() => stream.play(`agora_remote${stream.getId()}`), 20);
       });
   
       // Add
